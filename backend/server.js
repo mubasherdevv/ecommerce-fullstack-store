@@ -19,16 +19,16 @@ app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
 
 import path from 'path';
-import { fileURLToPath } from 'url';
 
 // Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+  const __dirname = path.resolve(); // This is the root of the backend folder during npm start
+  const frontendDistPath = path.join(__dirname, '../frontend/dist');
+  
+  app.use(express.static(frontendDistPath));
 
   app.get('*', (req, res) =>
-    res.sendFile(path.resolve(__dirname, '../frontend', 'dist', 'index.html'))
+    res.sendFile(path.resolve(frontendDistPath, 'index.html'))
   );
 } else {
   app.get('/api/health', (req, res) => {
