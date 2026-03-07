@@ -1,22 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useContext } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { FunnelIcon, AdjustmentsHorizontalIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import ProductCard from '../components/ProductCard';
-
-const allProducts = [
-  { id: 1, name: 'Wireless Headphones', price: 99.99, category: 'Electronics', rating: 4.5, reviews: 128, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400', discount: 20 },
-  { id: 2, name: 'Running Sneakers', price: 79.99, category: 'Fashion', rating: 4.3, reviews: 89, image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400', discount: 0 },
-  { id: 3, name: 'Smart Watch', price: 199.99, category: 'Electronics', rating: 4.7, reviews: 256, image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400', discount: 15 },
-  { id: 4, name: 'Leather Bag', price: 59.99, category: 'Fashion', rating: 4.2, reviews: 67, image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400', discount: 0 },
-  { id: 5, name: 'Coffee Maker', price: 129.99, category: 'Home', rating: 4.6, reviews: 312, image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400', discount: 10 },
-  { id: 6, name: 'Yoga Mat', price: 39.99, category: 'Sports', rating: 4.4, reviews: 183, image: 'https://images.unsplash.com/photo-1601925248591-58eb958e5dbb?w=400', discount: 0 },
-  { id: 7, name: 'Sunglasses', price: 49.99, category: 'Fashion', rating: 4.1, reviews: 54, image: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400', discount: 25 },
-  { id: 8, name: 'Desk Lamp', price: 34.99, category: 'Home', rating: 4.3, reviews: 97, image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=400', discount: 0 },
-  { id: 9, name: 'Gaming Mouse', price: 59.99, category: 'Electronics', rating: 4.6, reviews: 142, image: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400', discount: 0 },
-  { id: 10, name: 'Denim Jacket', price: 89.99, category: 'Fashion', rating: 4.0, reviews: 45, image: 'https://images.unsplash.com/photo-1551537482-f2075a1d41f2?w=400', discount: 30 },
-  { id: 11, name: 'Blender', price: 69.99, category: 'Home', rating: 4.5, reviews: 201, image: 'https://images.unsplash.com/photo-1570222094114-d054a817e56b?w=400', discount: 0 },
-  { id: 12, name: 'Resistance Bands', price: 24.99, category: 'Sports', rating: 4.2, reviews: 88, image: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400', discount: 0 },
-];
+import ProductContext from '../context/ProductContext';
 
 const categories = ['All', 'Electronics', 'Fashion', 'Home', 'Sports'];
 
@@ -25,25 +11,30 @@ const sortOptions = [
   { value: 'price-asc', label: 'Price: Low to High' },
   { value: 'price-desc', label: 'Price: High to Low' },
   { value: 'rating', label: 'Top Rated' },
-  { value: 'newest', label: 'Newest' },
 ];
 
 const ratingOptions = [4, 3, 2, 1];
 
 export default function ProductListingPage() {
+  const { products, loading, error, fetchProducts } = useContext(ProductContext);
   const [searchParams] = useSearchParams();
   const initialCategory = searchParams.get('category') || 'All';
   const searchQuery = searchParams.get('search') || '';
 
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
-  const [priceRange, setPriceRange] = useState([0, 250]);
+  const [priceRange, setPriceRange] = useState([0, 500]);
   const [minRating, setMinRating] = useState(0);
   const [sortBy, setSortBy] = useState('featured');
   const [showDiscount, setShowDiscount] = useState(false);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
+  useEffect(() => {
+    fetchProducts();
+    // eslint-disable-next-line
+  }, []);
+
   const filtered = useMemo(() => {
-    let list = [...allProducts];
+    let list = [...products];
 
     if (searchQuery) {
       list = list.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -53,14 +44,14 @@ export default function ProductListingPage() {
     }
     list = list.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
     if (minRating > 0) list = list.filter(p => p.rating >= minRating);
-    if (showDiscount) list = list.filter(p => p.discount > 0);
+    if (showDiscount) list = list.filter(p => p.originalPrice > p.price);
 
     if (sortBy === 'price-asc') list.sort((a, b) => a.price - b.price);
     else if (sortBy === 'price-desc') list.sort((a, b) => b.price - a.price);
     else if (sortBy === 'rating') list.sort((a, b) => b.rating - a.rating);
 
     return list;
-  }, [selectedCategory, priceRange, minRating, sortBy, showDiscount, searchQuery]);
+  }, [products, selectedCategory, priceRange, minRating, sortBy, showDiscount, searchQuery]);
 
   const FilterPanel = () => (
     <div className="space-y-8">
@@ -92,7 +83,8 @@ export default function ProductListingPage() {
           <input
             type="range"
             min="0"
-            max="250"
+            max="1000"
+            step="10"
             value={priceRange[1]}
             onChange={e => setPriceRange([priceRange[0], Number(e.target.value)])}
             className="w-full accent-primary"
@@ -141,7 +133,7 @@ export default function ProductListingPage() {
 
       {/* Clear Filters */}
       <button
-        onClick={() => { setSelectedCategory('All'); setPriceRange([0, 250]); setMinRating(0); setShowDiscount(false); }}
+        onClick={() => { setSelectedCategory('All'); setPriceRange([0, 500]); setMinRating(0); setShowDiscount(false); }}
         className="w-full py-2 text-sm text-primary border border-primary rounded-lg hover:bg-primary hover:text-white transition-all"
       >
         Clear Filters
@@ -208,16 +200,22 @@ export default function ProductListingPage() {
             </div>
           </div>
 
-          {/* Product Grid */}
-          {filtered.length > 0 ? (
+          {/* Loading / Error handling */}
+          {loading ? (
+            <div className="flex justify-center py-24">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+          ) : error ? (
+             <div className="bg-red-50 text-red-500 p-4 rounded-xl text-center">{error}</div>
+          ) : filtered.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
               {filtered.map(product => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard key={product._id} product={product} />
               ))}
             </div>
           ) : (
-            <div className="text-center py-24">
-              <div className="text-6xl mb-4">🔍</div>
+            <div className="text-center py-24 bg-white rounded-2xl shadow-sm border border-gray-100">
+              <div className="text-6xl mb-4 text-gray-300">🔍</div>
               <h3 className="text-xl font-semibold text-dark mb-2">No products found</h3>
               <p className="text-gray-medium">Try adjusting your filters or search term.</p>
             </div>
