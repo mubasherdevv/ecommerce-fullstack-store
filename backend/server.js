@@ -19,10 +19,12 @@ app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
 
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 // Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
-  const __dirname = path.resolve();
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
   app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
   app.get('*', (req, res) =>
@@ -50,6 +52,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
 });
