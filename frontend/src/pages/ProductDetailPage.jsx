@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   StarIcon, HeartIcon, ShoppingCartIcon, TruckIcon,
@@ -7,40 +7,73 @@ import {
 import { StarIcon as StarSolid } from '@heroicons/react/24/solid';
 import { useCart } from '../context/CartContext';
 import ProductCard from '../components/ProductCard';
-
-const allProducts = [
-  { id: 1, name: 'Wireless Headphones', price: 99.99, category: 'Electronics', rating: 4.5, reviews: 128, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600', discount: 20, description: 'Premium wireless headphones with active noise cancellation. Enjoy crystal-clear audio with 40-hour battery life and foldable design for portability. Bluetooth 5.0 ensures stable connectivity up to 30 meters.', colors: ['Black', 'White', 'Blue'] },
-  { id: 2, name: 'Running Sneakers', price: 79.99, category: 'Fashion', rating: 4.3, reviews: 89, image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600', discount: 0, description: 'Lightweight running sneakers with advanced cushioning technology. Breathable mesh upper keeps feet cool during long runs. Available in multiple colorways.', colors: ['Red/White', 'Black/Blue', 'Grey'] },
-  { id: 3, name: 'Smart Watch', price: 199.99, category: 'Electronics', rating: 4.7, reviews: 256, image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600', discount: 15, description: 'Advanced smartwatch with health monitoring, GPS, and 7-day battery. Tracks heart rate, sleep, blood oxygen, and 50+ workout modes. Water-resistant to 50 meters.', colors: ['Black', 'Silver', 'Gold'] },
-  { id: 4, name: 'Leather Bag', price: 59.99, category: 'Fashion', rating: 4.2, reviews: 67, image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600', discount: 0, description: 'Genuine leather tote bag with multiple compartments. Durable, stylish and perfect for everyday use or business meetings.', colors: ['Brown', 'Black', 'Tan'] },
-  { id: 5, name: 'Coffee Maker', price: 129.99, category: 'Home', rating: 4.6, reviews: 312, image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600', discount: 10, description: 'Programmable 12-cup coffee maker with built-in grinder and thermal carafe. Brew the perfect cup every time with customizable strength settings.', colors: ['Black', 'Stainless'] },
-  { id: 6, name: 'Yoga Mat', price: 39.99, category: 'Sports', rating: 4.4, reviews: 183, image: 'https://images.unsplash.com/photo-1601925248591-58eb958e5dbb?w=600', discount: 0, description: 'Non-slip, eco-friendly yoga mat with alignment marks. 6mm thick for optimal cushioning. Includes carrying strap.', colors: ['Purple', 'Blue', 'Green', 'Pink'] },
-  { id: 7, name: 'Sunglasses', price: 49.99, category: 'Fashion', rating: 4.1, reviews: 54, image: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600', discount: 25, description: 'UV400 protection polarized sunglasses in a timeless aviator design. Lightweight stainless steel frame.', colors: ['Gold/Brown', 'Silver/Grey', 'Black'] },
-  { id: 8, name: 'Desk Lamp', price: 34.99, category: 'Home', rating: 4.3, reviews: 97, image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=600', discount: 0, description: 'LED desk lamp with 5 color modes, 10 brightness levels, and USB charging port. Eye-care technology reduces flicker for long study sessions.', colors: ['White', 'Black', 'Silver'] },
-];
+import ProductContext from '../context/ProductContext';
 
 const extraImages = [
   'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=120',
   'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=120',
   'https://images.unsplash.com/photo-1487215078519-e21cc028cb29?w=120',
-  'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=120',
 ];
 
 export default function ProductDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const product = allProducts.find(p => p.id === Number(id)) || allProducts[0];
+  const { product, products, loading, error, fetchProductDetails, fetchProducts } = useContext(ProductContext);
 
-  const [selectedColor, setSelectedColor] = useState(product.colors?.[0] || '');
+  const [selectedColor, setSelectedColor] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [wished, setWished] = useState(false);
   const [added, setAdded] = useState(false);
 
-  const discountedPrice = product.discount
-    ? (product.price * (1 - product.discount / 100)).toFixed(2)
+  useEffect(() => {
+    fetchProductDetails(id);
+    if (products.length === 0) {
+      fetchProducts();
+    }
+    // Reset quantity and image on product change
+    setQuantity(1);
+    setSelectedImage(0);
+    // eslint-disable-next-line
+  }, [id]);
+
+  useEffect(() => {
+    if (product?.colors?.length > 0) {
+      setSelectedColor(product.colors[0]);
+    }
+  }, [product]);
+
+  if (loading || !product) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container-custom py-24 text-center">
+        <div className="bg-red-50 text-red-500 p-6 rounded-xl inline-block">
+          <h2 className="text-xl font-bold mb-2">Error Loading Product</h2>
+          <p>{error}</p>
+          <button onClick={() => navigate('/products')} className="mt-4 btn-primary">
+            Back to Products
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const discountedPrice = product.originalPrice && product.originalPrice > product.price
+    ? product.price.toFixed(2)
     : product.price.toFixed(2);
+    
+  // Calculate discount percentage if original price exists
+  const discountDisplay = product.originalPrice && product.originalPrice > product.price 
+    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+    : 0;
 
   const handleAddToCart = () => {
     for (let i = 0; i < quantity; i++) addToCart(product);
@@ -48,10 +81,10 @@ export default function ProductDetailPage() {
     setTimeout(() => setAdded(false), 2000);
   };
 
-  const related = allProducts.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4);
-  const stars = Array.from({ length: 5 }, (_, i) => i < Math.round(product.rating));
+  const related = products.filter(p => p.category === product.category && p._id !== product._id).slice(0, 4);
+  const stars = Array.from({ length: 5 }, (_, i) => i < Math.round(product.rating || 0));
 
-  const thumbnails = [product.image, ...extraImages.slice(0, 3)];
+  const thumbnails = [product.image, ...extraImages];
 
   return (
     <div className="container-custom py-8">
@@ -68,10 +101,10 @@ export default function ProductDetailPage() {
 
       {/* Back button */}
       <button
-        onClick={() => navigate(-1)}
+        onClick={() => navigate('/products')}
         className="flex items-center gap-2 text-sm text-gray-medium hover:text-primary transition-colors mb-6"
       >
-        <ArrowLeftIcon className="w-4 h-4" /> Back
+        <ArrowLeftIcon className="w-4 h-4" /> Back to Products
       </button>
 
       <div className="grid lg:grid-cols-2 gap-10 mb-16">
@@ -116,19 +149,27 @@ export default function ProductDetailPage() {
                   : <StarIcon key={i} className="w-4 h-4 text-gray-300" />
               ))}
             </div>
-            <span className="text-sm text-gray-medium">({product.reviews} reviews)</span>
-            <span className="text-sm font-semibold text-green-600 flex items-center gap-1">
-              <CheckIcon className="w-4 h-4" /> In Stock
-            </span>
+            <span className="text-sm text-gray-medium">({product.numReviews || 0} reviews)</span>
+            
+            {product.countInStock > 0 ? (
+              <span className="text-sm font-semibold text-green-600 flex items-center gap-1 ml-2 border-l pl-3">
+                <CheckIcon className="w-4 h-4" /> In Stock ({product.countInStock})
+              </span>
+            ) : (
+               <span className="text-sm font-semibold text-red-500 ml-2 border-l pl-3">
+                Out of Stock
+              </span>
+            )}
+            
           </div>
 
           {/* Price */}
           <div className="flex items-baseline gap-3 mb-6">
             <span className="text-3xl font-extrabold text-primary">${discountedPrice}</span>
-            {product.discount > 0 && (
+            {discountDisplay > 0 && (
               <>
-                <span className="text-lg text-gray-medium line-through">${product.price.toFixed(2)}</span>
-                <span className="badge bg-primary text-white">{product.discount}% OFF</span>
+                <span className="text-lg text-gray-medium line-through">${product.originalPrice.toFixed(2)}</span>
+                <span className="badge bg-primary text-white">{discountDisplay}% OFF</span>
               </>
             )}
           </div>
@@ -139,7 +180,7 @@ export default function ProductDetailPage() {
           </p>
 
           {/* Color selector */}
-          {product.colors && (
+          {product.colors && product.colors.length > 0 && (
             <div className="mb-6">
               <label className="text-sm font-semibold text-dark mb-3 block">
                 Color: <span className="text-primary">{selectedColor}</span>
@@ -169,13 +210,15 @@ export default function ProductDetailPage() {
               <button
                 onClick={() => setQuantity(q => Math.max(1, q - 1))}
                 className="px-4 py-3 text-lg font-bold hover:bg-gray-light transition-colors"
+                disabled={product.countInStock === 0}
               >
                 −
               </button>
               <span className="px-5 py-3 text-base font-semibold min-w-[3rem] text-center">{quantity}</span>
               <button
-                onClick={() => setQuantity(q => q + 1)}
+                onClick={() => setQuantity(q => Math.min(product.countInStock, q + 1))}
                 className="px-4 py-3 text-lg font-bold hover:bg-primary hover:text-white transition-colors"
+                disabled={product.countInStock === 0 || quantity >= product.countInStock}
               >
                 +
               </button>
@@ -184,14 +227,17 @@ export default function ProductDetailPage() {
             {/* Add to cart */}
             <button
               onClick={handleAddToCart}
+              disabled={product.countInStock === 0}
               className={`flex-1 flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl font-semibold text-sm transition-all duration-300 ${
-                added
-                  ? 'bg-green-500 text-white scale-105'
-                  : 'bg-primary text-white hover:bg-primary-dark hover:shadow-lg hover:-translate-y-0.5'
+                product.countInStock === 0 
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : added
+                    ? 'bg-green-500 text-white scale-105'
+                    : 'bg-primary text-white hover:bg-primary-dark hover:shadow-lg hover:-translate-y-0.5'
               }`}
             >
               <ShoppingCartIcon className="w-5 h-5" />
-              {added ? '✓ Added to Cart!' : 'Add to Cart'}
+              {product.countInStock === 0 ? 'Out of Stock' : added ? '✓ Added to Cart!' : 'Add to Cart'}
             </button>
 
             {/* Wishlist */}
@@ -242,7 +288,7 @@ export default function ProductDetailPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {related.map(p => (
-              <ProductCard key={p.id} product={p} />
+              <ProductCard key={p._id} product={p} />
             ))}
           </div>
         </section>
