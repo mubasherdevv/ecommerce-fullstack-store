@@ -89,7 +89,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 pt-6 border-t border-white/10 text-center text-xs text-gray-500">
-          © {new Date().getFullYear()} Exclusive. All rights reserved.
+          © {new Date().getFullYear()} Exclusive Ecommerce Store. <b>Created by Mubasher</b>
         </div>
       </div>
     </footer>

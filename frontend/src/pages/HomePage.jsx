@@ -1,4 +1,4 @@
-import { useEffect, useContext, useState } from 'react';
+import { useEffect, useContext, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRightIcon, TruckIcon, ShieldCheckIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import ProductCard from '../components/ProductCard';
@@ -6,6 +6,39 @@ import ProductContext from '../context/ProductContext';
 import FAQSection from '../components/FAQSection';
 
 import axios from 'axios';
+
+function useCountUp(end, duration = 2000, start = 0) {
+  const [count, setCount] = useState(start);
+  const countRef = useRef(start);
+  const frameRef = useRef();
+
+  useEffect(() => {
+    const startTime = performance.now();
+    const startValue = start;
+
+    const animate = (currentTime) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      countRef.current = Math.round(startValue + (end - startValue) * easeOut);
+      setCount(countRef.current);
+      
+      if (progress < 1) {
+        frameRef.current = requestAnimationFrame(animate);
+      }
+    };
+
+    frameRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (frameRef.current) {
+        cancelAnimationFrame(frameRef.current);
+      }
+    };
+  }, [end, duration, start]);
+
+  return count;
+}
 
 const features = [
   {
@@ -37,6 +70,14 @@ const features = [
 export default function HomePage() {
   const { products, loading, error, fetchProducts } = useContext(ProductContext);
   const [categories, setCategories] = useState([]);
+  const [inView, setInView] = useState(false);
+  const [countdown, setCountdown] = useState({
+    days: 2,
+    hours: 14,
+    minutes: 32,
+    seconds: 45
+  });
+  const statsRef = useRef(null);
 
   useEffect(() => {
     fetchProducts();
@@ -50,6 +91,61 @@ export default function HomePage() {
     };
     fetchCategories();
     // eslint-disable-next-line
+  }, []);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.3 }
+    );
+
+    if (statsRef.current) {
+      observer.observe(statsRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  const productCount = useCountUp(inView ? 10000 : 0, 2000);
+  const customerCount = useCountUp(inView ? 50000 : 0, 2000);
+  const ratingValue = useCountUp(inView ? 48 : 0, 2000);
+
+  useEffect(() => {
+    let seconds = 45;
+    let minutes = 32;
+    let hours = 14;
+    let days = 2;
+
+    const interval = setInterval(() => {
+      seconds--;
+      if (seconds < 0) {
+        seconds = 59;
+        minutes--;
+      }
+      if (minutes < 0) {
+        minutes = 59;
+        hours--;
+      }
+      if (hours < 0) {
+        hours = 23;
+        days--;
+      }
+      if (days < 0) {
+        days = 0;
+        hours = 0;
+        minutes = 0;
+        seconds = 0;
+        clearInterval(interval);
+      }
+      setCountdown({ days, hours, minutes, seconds });
+    }, 1000);
+
+    return () => clearInterval(interval);
   }, []);
 
   // Display only top 8 products on home page
@@ -87,13 +183,25 @@ export default function HomePage() {
                 </Link>
               </div>
               {/* Stats */}
-              <div className="flex gap-8 mt-12 pt-8 border-t border-white/10">
-                {[['10K+', 'Products'], ['50K+', 'Customers'], ['4.8★', 'Rating']].map(([val, label]) => (
-                  <div key={label}>
-                    <div className="text-2xl font-bold text-primary">{val}</div>
-                    <div className="text-xs text-gray-400 mt-0.5">{label}</div>
+              <div ref={statsRef} className="flex gap-8 mt-12 pt-8 border-t border-white/10">
+                <div>
+                  <div className="text-2xl font-bold text-primary">
+                    {(productCount / 1000).toFixed(1)}K+
                   </div>
-                ))}
+                  <div className="text-xs text-gray-400 mt-0.5">Products</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-primary">
+                    {(customerCount / 1000).toFixed(1)}K+
+                  </div>
+                  <div className="text-xs text-gray-400 mt-0.5">Customers</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-primary">
+                    {(ratingValue / 10).toFixed(1)}★
+                  </div>
+                  <div className="text-xs text-gray-400 mt-0.5">Rating</div>
+                </div>
               </div>
             </div>
             {/* Hero image */}
@@ -238,33 +346,76 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Promo Banner */}
-      <section className="bg-dark text-white py-16">
-        <div className="container-custom">
-          <div className="grid md:grid-cols-5 gap-8 items-center">
-            <div className="md:col-span-3">
-              <span className="text-xs font-semibold text-primary uppercase tracking-widest mb-2 block">Limited Time Offer</span>
-              <h2 className="text-3xl md:text-4xl font-extrabold mb-4 leading-tight">
-                Get the Latest iPhone 15 <span className="text-primary">Up to 10% off</span>
+      {/* Limited Time Offer - New Design */}
+      <section className="relative overflow-hidden bg-gradient-to-r from-gray-900 via-dark to-gray-900 text-white py-12 lg:py-20">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-1/4 w-64 h-64 bg-primary rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-blue-500 rounded-full blur-3xl" />
+        </div>
+        
+        <div className="container-custom relative">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            {/* Content */}
+            <div className="text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 bg-primary/20 border border-primary/30 rounded-full px-4 py-1.5 text-sm font-medium mb-4">
+                <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+                Limited Time Offer
+              </div>
+              
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-4 leading-tight">
+                Super Flash Sale
+                <span className="block text-primary mt-1">50% OFF</span>
               </h2>
-              <div className="flex gap-4 mb-6">
-                {[['23', 'Hours'], ['05', 'Days'], ['59', 'Minutes'], ['35', 'Seconds']].map(([val, label]) => (
-                  <div key={label} className="text-center">
-                    <div className="bg-white text-dark text-lg font-bold w-14 h-14 rounded-xl flex items-center justify-center shadow">{val}</div>
-                    <div className="text-xs text-gray-400 mt-1">{label}</div>
+              
+              <p className="text-gray-400 mb-8 max-w-md mx-auto lg:mx-0">
+                Don't miss out on this exclusive deal! Get your favorite products at an unbeatable price. Offer ends soon.
+              </p>
+
+              {/* Animated Countdown */}
+              <div className="flex justify-center lg:justify-start gap-3 sm:gap-4 mb-8">
+                {[
+                  { value: countdown.days, label: 'Days' },
+                  { value: countdown.hours, label: 'Hours' },
+                  { value: countdown.minutes, label: 'Mins' },
+                  { value: countdown.seconds, label: 'Secs' }
+                ].map((item, idx) => (
+                  <div key={item.label} className="text-center">
+                    <div className="relative bg-gradient-to-b from-gray-800 to-gray-900 rounded-xl p-3 sm:p-4 w-16 sm:w-20 h-16 sm:h-20 flex items-center justify-center shadow-lg border border-gray-700">
+                      <span className="text-xl sm:text-2xl font-bold text-white tabular-nums">
+                        {String(item.value).padStart(2, '0')}
+                      </span>
+                      {idx < 3 && (
+                        <span className="absolute right-[-8px] text-primary font-bold text-lg">:</span>
+                      )}
+                    </div>
+                    <span className="text-xs text-gray-500 mt-2 block">{item.label}</span>
                   </div>
                 ))}
               </div>
-              <Link to="/products?category=Electronics" className="btn-primary inline-flex items-center gap-2">
-                Buy Now <ArrowRightIcon className="w-4 h-4" />
+
+              <Link 
+                to="/products" 
+                className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+              >
+                Shop Now <ArrowRightIcon className="w-5 h-5" />
               </Link>
             </div>
-            <div className="md:col-span-2">
-              <img
-                src="https://images.unsplash.com/photo-1556656793-08538906a9f8?w=500"
-                alt="iPhone 15"
-                className="w-full rounded-2xl shadow-2xl max-h-72 object-cover"
-              />
+
+            {/* Image */}
+            <div className="relative hidden lg:block">
+              <div className="relative">
+                <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-full blur-3xl" />
+                <img
+                  src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500"
+                  alt="Flash Sale"
+                  className="relative w-full max-w-md mx-auto rounded-3xl shadow-2xl transform hover:scale-105 transition-transform duration-500"
+                />
+                {/* Floating Badge */}
+                <div className="absolute -top-4 -right-4 bg-gradient-to-br from-primary to-red-500 text-white rounded-2xl p-4 shadow-xl animate-bounce">
+                  <span className="text-3xl font-extrabold">50%</span>
+                  <span className="block text-xs font-medium">OFF</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -2,28 +2,7 @@
 
 A comprehensive full-stack e-commerce web application built with the **MERN Stack** (MongoDB, Express.js, React + Vite, and Node.js). This platform provides a complete shopping experience with user authentication, product management, shopping cart functionality, order processing, and a robust admin dashboard.
 
-## Table of Contents
 
-- [Project Overview](#project-overview)
-- [Project Structure](#project-structure)
-- [Technology Stack](#technology-stack)
-- [Main Features](#main-features)
-- [Backend Architecture](#backend-architecture)
-  - [API Routes](#api-routes)
-  - [Database Schema](#database-schema)
-  - [Authentication](#authentication)
-- [Frontend Architecture](#frontend-architecture)
-  - [Pages](#pages)
-  - [Components](#components)
-  - [Context Providers](#context-providers)
-- [Key Dependencies](#key-dependencies)
-- [Environment Variables](#environment-variables)
-- [Build and Run Instructions](#build-and-run-instructions)
-- [Available Scripts](#available-scripts)
-- [Default Users](#default-users)
-- [Future Enhancements](#future-enhancements)
-
----
 
 ## Project Overview
 
