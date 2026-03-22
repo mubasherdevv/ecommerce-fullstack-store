@@ -178,6 +178,6 @@ NODE_ENV=development
 
 <div align="center">
 
-**Developed By Mubasher**
+**Developed By Mubasher ❤**
 
 </div>
