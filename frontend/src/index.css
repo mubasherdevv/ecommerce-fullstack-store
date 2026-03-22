@@ -77,3 +77,12 @@
 .toast-enter {
   animation: slideIn 0.3s ease forwards;
 }
+
+/* Hide scrollbar */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

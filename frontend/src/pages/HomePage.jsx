@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRightIcon, TruckIcon, ShieldCheckIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import ProductCard from '../components/ProductCard';
 import ProductContext from '../context/ProductContext';
+import FAQSection from '../components/FAQSection';
 
 import axios from 'axios';
 
@@ -67,7 +68,7 @@ export default function HomePage() {
             {/* Text */}
             <div>
               <div className="inline-flex items-center gap-2 bg-primary/20 text-primary-light border border-primary/30 rounded-full px-4 py-1.5 text-sm font-medium mb-6">
-                🔥 Summer Collection 2025
+                🔥 Summer Collection 2026
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
                 Shop the Best
@@ -134,40 +135,46 @@ export default function HomePage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {categories.slice(0, 8).map(cat => (
-            <Link
-              key={cat._id}
-              to={`/products?category=${cat.name}`}
-              className="group bg-white rounded-2xl p-6 text-center transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border border-gray-100 hover:border-primary/30"
-            >
-              <div className="w-16 h-16 mx-auto mb-3 rounded-2xl overflow-hidden bg-gray-50 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 shadow-sm border border-gray-100">
-                {cat.image ? (
-                  <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
-                ) : (
-                  <span className="text-xl font-bold text-gray-400 uppercase">{cat.name.substring(0, 2)}</span>
-                )}
-              </div>
-              <span className="text-sm font-semibold text-dark block mb-1">{cat.name}</span>
-              <span className="text-xs text-gray-medium bg-gray-50 px-2 py-0.5 rounded-full">{cat.productCount || 0} items</span>
-            </Link>
-          ))}
+        <div className="relative">
+          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory scroll-smooth">
+            {categories.slice(0, 8).map((cat, index) => (
+              <Link
+                key={cat._id}
+                to={`/products?category=${cat.name}`}
+                className="group flex-shrink-0 w-40 sm:w-44 md:w-48 bg-white rounded-2xl p-5 text-center transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border border-gray-100 hover:border-primary/30 snap-start"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <div className="w-16 h-16 mx-auto mb-3 rounded-2xl overflow-hidden bg-gray-50 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 shadow-sm border border-gray-100">
+                  {cat.image ? (
+                    <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-xl font-bold text-gray-400 uppercase">{cat.name.substring(0, 2)}</span>
+                  )}
+                </div>
+                <span className="text-sm font-semibold text-dark block mb-1">{cat.name}</span>
+                <span className="text-xs text-gray-medium bg-gray-50 px-2 py-0.5 rounded-full">{cat.productCount || 0} items</span>
+              </Link>
+            ))}
+          </div>
+          <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 w-16 h-full bg-gradient-to-l from-gray-50 to-transparent pointer-events-none" />
         </div>
       </section>
 
       {/* Featured Products */}
-      <section className="container-custom pb-16">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-5 h-10 bg-primary rounded-sm" />
-              <span className="text-sm font-semibold text-primary">This Month</span>
+      <section className="pb-16">
+        <div className="container-custom mb-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-5 h-10 bg-primary rounded-sm" />
+                <span className="text-sm font-semibold text-primary">This Month</span>
+              </div>
+              <h2 className="section-title">Featured Products</h2>
             </div>
-            <h2 className="section-title">Featured Products</h2>
+            <Link to="/products" className="flex items-center gap-2 btn-outline text-sm py-2 px-4">
+              View All <ArrowRightIcon className="w-4 h-4" />
+            </Link>
           </div>
-          <Link to="/products" className="hidden sm:flex items-center gap-2 btn-outline text-sm py-2 px-4">
-            View All <ArrowRightIcon className="w-4 h-4" />
-          </Link>
         </div>
 
         {loading ? (
@@ -175,16 +182,56 @@ export default function HomePage() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
           </div>
         ) : error ? (
-          <div className="bg-red-50 text-red-500 p-4 rounded-xl text-center">{error}</div>
+          <div className="bg-red-50 text-red-500 p-4 rounded-xl text-center mx-4">{error}</div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map(product => (
-              <ProductCard key={product._id} product={product} />
-            ))}
-          </div>
+          <>
+            {/* Mobile/Tablet Grid */}
+            <div className="block md:hidden">
+              <div className="grid grid-cols-2 gap-3 px-3">
+                {featuredProducts.map(product => (
+                  <Link
+                    key={product._id}
+                    to={`/products/${product._id}`}
+                    className="bg-white rounded-xl shadow-sm overflow-hidden"
+                  >
+                    <div className="aspect-square bg-gray-light overflow-hidden">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="p-3">
+                      <p className="font-bold text-base text-dark mb-1">${product.price.toFixed(2)}</p>
+                      <p className="text-sm text-gray-500 line-clamp-2 leading-tight">{product.name}</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Desktop Grid - Responsive columns */}
+            <div className="hidden lg:block container-custom mx-auto">
+              <div className="grid grid-cols-4 gap-6">
+                {featuredProducts.map(product => (
+                  <ProductCard key={product._id} product={product} />
+                ))}
+              </div>
+            </div>
+
+            {/* Tablet Grid */}
+            <div className="hidden md:block lg:hidden container-custom mx-auto">
+              <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 xl:gap-6">
+                {featuredProducts.map(product => (
+                  <ProductCard key={product._id} product={product} />
+                ))}
+              </div>
+            </div>
+          </>
         )}
 
-        <div className="text-center mt-10 sm:hidden">
+        <div className="text-center mt-8 md:hidden">
           <Link to="/products" className="btn-primary inline-flex items-center gap-2">
             View All Products <ArrowRightIcon className="w-4 h-4" />
           </Link>
@@ -237,6 +284,9 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* FAQ Section */}
+      <FAQSection />
 
       {/* Newsletter */}
       <section className="bg-gradient-to-r from-primary to-primary-dark text-white py-16">

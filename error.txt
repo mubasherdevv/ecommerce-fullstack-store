@@ -1,0 +1,32 @@
+Fix my Featured Products for mobile view using Tailwind CSS.
+
+Current issue: Cards are too large, single column, 
+
+not matching target design.
+
+Target mobile design:
+
+- White card, rounded-xl, subtle shadow
+
+- Product image: full width, aspect-square, 
+
+  object-cover, rounded-lg on top
+
+- Below image (padding p-3):
+
+  - Price: bold, black, text-base (e.g. $299.99)
+
+  - Description: text-sm, text-gray-500, 
+
+    truncate (max 2 lines, line-clamp-2)
+
+- No add-to-cart button visible on mobile 
+
+  (hide it or show on hover only)
+
+- Card width: auto (controlled by parent grid)
+
+Parent grid (where ProductCard is used):
+
+grid grid-cols-2 gap-3 px-3
+

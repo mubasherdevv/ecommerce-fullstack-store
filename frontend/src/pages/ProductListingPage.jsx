@@ -208,11 +208,42 @@ export default function ProductListingPage() {
           ) : error ? (
              <div className="bg-red-50 text-red-500 p-4 rounded-xl text-center">{error}</div>
           ) : filtered.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-              {filtered.map(product => (
-                <ProductCard key={product._id} product={product} />
-              ))}
-            </div>
+            <>
+              {/* Mobile/Tablet Grid */}
+              <div className="block lg:hidden">
+                <div className="grid grid-cols-2 gap-3">
+                  {filtered.map(product => (
+                    <Link
+                      key={product._id}
+                      to={`/products/${product._id}`}
+                      className="bg-white rounded-xl shadow-sm overflow-hidden"
+                    >
+                      <div className="aspect-square bg-gray-light overflow-hidden">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      </div>
+                      <div className="p-3">
+                        <p className="font-bold text-base text-dark mb-1">${product.price.toFixed(2)}</p>
+                        <p className="text-sm text-gray-500 line-clamp-2 leading-tight">{product.name}</p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              {/* Desktop Grid */}
+              <div className="hidden lg:block">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {filtered.map(product => (
+                    <ProductCard key={product._id} product={product} />
+                  ))}
+                </div>
+              </div>
+            </>
           ) : (
             <div className="text-center py-24 bg-white rounded-2xl shadow-sm border border-gray-100">
               <div className="text-6xl mb-4 text-gray-300">🔍</div>
