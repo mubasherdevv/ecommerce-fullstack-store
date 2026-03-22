@@ -1,6 +1,14 @@
 # Exclusive — E-Commerce Platform
 
-A modern full-stack e-commerce web app built with the **MERN Stack** (MongoDB, Express.js, React + Vite, Node.js).
+<div align="center">
+
+![Exclusive Logo](https://img.shields.io/badge/MERN-Stack-444?style=for-the-badge&logo=mongodb&logoColor=green)
+![React](https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react&logoColor=white)
+![Tailwind](https://img.shields.io/badge/Tailwind-CSS-38b2ac?style=for-the-badge&logo=tailwind-css&logoColor=white)
+
+**A modern full-stack e-commerce web app built with the MERN Stack**
+
+</div>
 
 ---
 
@@ -15,79 +23,138 @@ A modern full-stack e-commerce web app built with the **MERN Stack** (MongoDB, E
 
 ---
 
-## Screenshots
+## 📸 Screenshots
 
-### Desktop
+### 🖥️ Desktop Version
 
-| Dashboard | Products | Product Detail |
-|:---------:|:--------:|:--------------:|
-| ![Admin Dashboard](desktop/admin.png) | ![Products](desktop/admin-product.png) | ![Product Detail](desktop/productdetail-page.png) |
-
-| Admin Categories | Login | Register |
-|:---------------:|:-----:|:--------:|
-| ![Categories](desktop/admin-category.png) | ![Login](desktop/login.png) | ![Register](desktop/register.png) |
-
-### Mobile
-
-| Home | Products | Login |
-|:----:|:--------:|:-----:|
-| ![Home](mobile/home.gif) | ![Products](mobile/product.png) | ![Login](mobile/login.png) |
+<table>
+  <tr>
+    <td align="center"><b>Home</b></td>
+    <td align="center"><b>Product Page</b></td>
+    <td align="center"><b>Product Detail</b></td>
+  </tr>
+  <tr>
+    <td><img src="assets/desktop/home.gif" width="100%"/></td>
+    <td><img src="assets/desktop/product-page.png" width="100%"/></td>
+    <td><img src="assets/desktop/product detail.png" width="100%"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Cart</b></td>
+    <td align="center"><b>Login</b></td>
+    <td align="center"><b>Register</b></td>
+  </tr>
+  <tr>
+    <td><img src="assets/desktop/cart.png" width="100%"/></td>
+    <td><img src="assets/desktop/login.png" width="100%"/></td>
+    <td><img src="assets/desktop/register.png" width="100%"/></td>
+  </tr>
+</table>
 
 ---
 
-## Quick Start
+### 👨‍💼 Admin Panel
 
-```Setup 
-npm install                    # Install all dependencies
-npm start                      # Backend → http://localhost:5000
-cd frontend && npm run dev     # Frontend → http://localhost:5173
+<table>
+  <tr>
+    <td align="center"><b>Dashboard</b></td>
+    <td align="center"><b>Products</b></td>
+  </tr>
+  <tr>
+    <td><img src="assets/admin/Dashboard.png" width="100%"/></td>
+    <td><img src="assets/admin/Product.png" width="100%"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Categories</b></td>
+    <td align="center"><b>Orders</b></td>
+  </tr>
+  <tr>
+    <td><img src="assets/admin/Category Page.png" width="100%"/></td>
+    <td><img src="assets/admin/Order Page.png" width="100%"/></td>
+  </tr>
+</table>
+
+---
+
+### 📱 Mobile Version
+
+<table>
+  <tr>
+    <td align="center"><b>Home</b></td>
+    <td align="center"><b>Products</b></td>
+  </tr>
+  <tr>
+    <td><img src="assets/mobile/home.gif" width="40%"/></td>
+    <td><img src="assets/mobile/product.png" width="40%"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Login</b></td>
+    <td align="center"><b>Register</b></td>
+  </tr>
+  <tr>
+    <td><img src="assets/mobile/login.png" width="40%"/></td>
+    <td><img src="assets/mobile/register.png" width="40%"/></td>
+  </tr>
+</table>
+
+---
+
+## 🚀 Quick Start
+
+```bash
+# Install dependencies
+npm install
+
+# Start backend (port 5000)
+npm start
+
+# Start frontend (port 5173)
+cd frontend && npm run dev
+
+# Seed sample data
+npm run data:import
 ```
 
 ---
 
-## Pages & Features
+## 📋 Pages & Features
 
-**🏠 Home** — Hero banner with animated stats, category carousel, featured products grid, flash sale countdown, FAQ section, and newsletter signup
-
-**📦 Products** — Full catalog with category, price & rating filters, sort options, search by name, discount toggle, and mobile filter drawer
-
-**📄 Product Detail** — Image gallery, discount badge, stock status, color selector, quantity controls, add to cart, wishlist, related products, and recently viewed (localStorage)
-
-**🛒 Cart** — Item management, quantity adjust, coupon code (SAVE10 = 10% off), price breakdown with shipping, and empty cart state
-
-**🔐 Auth** — Login with validation, register with confirm password, JWT session management, protected routes
-
-**👤 Profile** — User avatar with initials, account info, and link to order history
-
-**📋 Orders** — Order list with status badges, dates, totals, and delivery tracking
+| Page | Description |
+|------|-------------|
+| 🏠 **Home** | Hero banner with animated stats, category carousel, featured products, flash sale countdown, FAQ, newsletter |
+| 📦 **Products** | Catalog with filters (category, price, rating), sort options, search, discount toggle |
+| 📄 **Product Detail** | Image gallery, stock status, color selector, quantity controls, add to cart, related products |
+| 🛒 **Cart** | Item management, quantity adjust, coupon codes (SAVE10), price breakdown |
+| 🔐 **Auth** | Login & register with validation, JWT session, protected routes |
+| 👤 **Profile** | User avatar, account info, order history link |
+| 📋 **Orders** | Order list with status badges, delivery tracking |
 
 ---
 
-## Admin Panel
+## 👨‍💼 Admin Panel
 
-**Dashboard** — Revenue & orders KPIs, 7-day revenue chart, recent orders table
-
-**Products** — Full CRUD with image, name, description, category, price, and stock management
-
-**Categories** — Add, edit, delete categories (protected if products exist), with product count display
-
-**Orders** — View all orders with full details, mark as delivered
+| Page | Features |
+|------|----------|
+| 📊 **Dashboard** | Revenue KPIs, 7-day chart, recent orders |
+| 📦 **Products** | Full CRUD — image, name, description, category, price, stock |
+| 📂 **Categories** | Add, edit, delete (protected if products exist) |
+| 🚚 **Orders** | View details, mark as delivered |
 
 ---
 
 ## ✨ Features
 
-- **Product Browsing** — Filters, search, sorting, detailed pages with gallery & reviews
-- **Shopping Cart** — Add/remove, quantity adjust, coupon codes, real-time price calculation
-- **Checkout & Orders** — Shipping address, order placement, history, delivery tracking
-- **User Auth** — Register, login, profile, JWT session management
-- **Admin Panel** — Full CRUD for products, categories & orders with analytics dashboard
-- **Responsive Design** — Fully optimized for mobile and desktop
-- **Dynamic Data** — All content fetched live from MongoDB via REST API
+- ✅ Product browsing with filters, search & sorting
+- ✅ Shopping cart with quantity adjust & coupon codes
+- ✅ User authentication with JWT
+- ✅ Order placement & history tracking
+- ✅ Admin dashboard with analytics
+- ✅ Full CRUD for products, categories & orders
+- ✅ Responsive design (mobile & desktop)
+- ✅ Dynamic data from MongoDB
 
 ---
 
-## Environment Setup
+## ⚙️ Environment Setup
 
 Create `backend/.env`:
 
@@ -100,11 +167,17 @@ NODE_ENV=development
 
 ---
 
-## Default Users
+## 👤 Default Users
 
 | Role | Email | Password |
 |------|-------|----------|
 | Admin | admin@example.com | password123 |
 | User | john@example.com | password123 |
 
-Seed data: `npm run data:import`
+---
+
+<div align="center">
+
+**Built with ❤️ using MERN Stack**
+
+</div>
